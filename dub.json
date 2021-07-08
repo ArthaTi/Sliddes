@@ -1,0 +1,15 @@
+{
+	"authors": [
+		"Artha"
+	],
+	"copyright": "Copyright © 2021, Artha",
+	"dependencies": {
+		"elemi": "~>1.2"
+	},
+	"description": "A server + HTML generator for making remotely controlled slides",
+	"license": "BSL",
+	"name": "sliddes",
+	"targetPath": "build",
+	"targetType": "library",
+	"copyFiles": ["resources/"]
+}
