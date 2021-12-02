@@ -21,3 +21,9 @@ div.slide {
     box-sizing: border-box;
 
 }
+
+div.image-slide img {
+
+    max-height: 80vh;
+
+}
