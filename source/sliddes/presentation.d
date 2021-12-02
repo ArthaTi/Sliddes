@@ -5,16 +5,49 @@ import elemi;
 import std.algorithm;
 import std.exception;
 
-import sliddes.slide;
-
 
 @safe:
 
 
 struct Presentation {
 
-    string stylesheet;
-    Slide[] slides;
+    public {
+
+        string title;
+        string stylesheet;
+
+        /// Template for each slide
+        Element delegate(string[] cls...) boilerplate;
+
+    }
+
+    private {
+
+        Element slides;
+
+    }
+
+    ref Presentation add(alias fun, T...)(T args) {
+
+        import std.traits;
+
+        alias Params = Parameters!fun;
+
+        // Prepare the template
+        if (!boilerplate) {
+
+            boilerplate = delegate(string[] cls...)
+                => elem!"div"(
+                    attr("class") = ["slide"] ~ cls,
+                );
+
+        }
+
+        slides ~= fun(this, args);
+
+        return this;
+
+    }
 
     /// Render and write out the presentation.
     void generate(string output = "public") const {
@@ -31,7 +64,7 @@ struct Presentation {
         );
 
         // Generate the presentation
-        buildPath(output, "presentation.html")
+        buildPath(output, "index.html")
             .write(render);
 
     }
@@ -68,12 +101,13 @@ struct Presentation {
 
                 stylesheets,
 
+                elem!"title"(title),
             ),
             elem!"body"(
                 elem!"noscript"(
                     "Warning! JavaScript is disabled. This page won't work without it."
                 ),
-                slides.map!"a.render",
+                slides,
             ),
 
         );
@@ -86,9 +120,8 @@ unittest {
 
     import sliddes.basic_slides;
 
-    Presentation pres;
-    pres.slides ~= new TitleSlide("Welcome to my presentation", "More info...");
-
-    pres.generate("public/test1");
+    Presentation("Welcome to my presentation")
+        .add!titleSlide("This is a subtitle")
+        .generate("public/test1");
 
 }
