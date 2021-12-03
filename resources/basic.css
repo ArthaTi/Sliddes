@@ -27,3 +27,27 @@ div.image-slide img {
     max-height: 80vh;
 
 }
+
+#popup-area {
+
+    display: inline-block;
+
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    z-index: 10;
+
+}
+
+div.popup {
+
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 10px 8px;
+
+    background: #fff;
+    box-shadow: #000a 0 0 10px;
+    border-radius: 5px;
+
+}

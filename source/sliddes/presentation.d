@@ -15,6 +15,10 @@ import sliddes.transmitter;
 
 struct Presentation {
 
+    enum noscript = elem!"noscript"(
+        "Warning! JavaScript is disabled. This page won't work without it."
+    );
+
     public {
 
         string title;
@@ -97,15 +101,10 @@ struct Presentation {
 
         }
 
-        // Load stylesheet
+        // Load resources
         copyResource("basic.css");
         copyResource("receiver.js");
-
-        // Load scripts
-        copy(
-            buildPath(thisExePath.dirName, "resources/basic.css"),
-            buildPath(output, "basic.css"),
-        );
+        copyResource("admin.js");
 
         // Generate the presentation
         buildPath(output, "index.html")
@@ -187,10 +186,12 @@ struct Presentation {
                 ),
             ),
             elem!"body"(
-                elem!"noscript"(
-                    "Warning! JavaScript is disabled. This page won't work without it."
-                ),
+                noscript,
                 slides,
+
+                elem!"div"(
+                    attr("id") = "popup-area",
+                ),
             ),
 
         );
@@ -212,9 +213,30 @@ struct Presentation {
                 Element.EncodingUTF8,
 
                 elem!"title"(title ~ " — admin"),
+
+                elem!"script"(
+                    attr("src") = "admin.js"
+                ),
             ),
 
             elem!"body"(
+
+                noscript,
+
+                elem!"div"(
+
+                    elem!"input"(
+                        attr("id") = "test-id",
+                        attr("type") = "number",
+                        attr("placeholder") = "ID number for testing",
+                    ),
+
+                    elem!"button"(
+                        attr("onclick") = "test()",
+                        "Test connection",
+                    )
+
+                ),
 
                 elem!"ol"(
                     attr("class") = ["slide-list"],
@@ -234,8 +256,21 @@ struct Presentation {
 
                     elem!"div"(
                         attr("id") = format!"slide%s"(i),
+
+                        // Slide header
                         elem!"h2"(slideTitles[i]),
+
+                        // Buttons
+                        elem!"div"(
+                            elem!"button"(
+                                attr("onclick") = format!"switchTo(%s)"(i),
+                                "Switch to slide"
+                            ),
+                        ),
+
+                        // Notes
                         notes[i],
+
                     ),
 
                 ),

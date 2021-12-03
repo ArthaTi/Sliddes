@@ -24,7 +24,7 @@ async function listen() {
 
         // Log any potential errors, try again
         console.error(exc);
-        setTimeout(listen, 500);
+        setTimeout(listen, 1500);
 
     }
 
@@ -45,6 +45,12 @@ async function process(data) {
     else if ("offset" in data) {
 
         setSlide(currentSlide + data["offset"]);
+
+    }
+
+    else if ("test" in data) {
+
+        popup("Test message from: " + data["test"]);
 
     }
 
@@ -69,5 +75,23 @@ function setSlide(target) {
 function assert(cond, msg) {
 
     if (!cond) throw new Exception(msg);
+
+}
+
+function popup(message) {
+
+    let target = document.getElementById("popup-area");
+    let content = document.createTextNode(message);
+
+    let thing = document.createElement("div");
+    thing.classList.add("popup");
+    thing.appendChild(content);
+
+    let outerThing = document.createElement("div");
+    outerThing.appendChild(thing);
+
+    target.appendChild(outerThing);
+
+    setTimeout(() => target.removeChild(outerThing), 5000);
 
 }

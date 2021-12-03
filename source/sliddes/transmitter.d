@@ -22,6 +22,10 @@ class Transmitter {
             (OffsetSlideMsg msg) {
                 writeln(msg);
                 response.body = format!q{ {"offset": %s} }(msg.offset);
+            },
+            (TestMsg msg) {
+                writeln(msg);
+                response.body = format!q{ {"test": %s} }(msg.identifier);
             }
         );
 
@@ -38,5 +42,11 @@ struct SetSlideMsg {
 struct OffsetSlideMsg {
 
     ptrdiff_t offset;
+
+}
+
+struct TestMsg {
+
+    int identifier;
 
 }

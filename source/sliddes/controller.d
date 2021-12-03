@@ -18,10 +18,17 @@ class Controller {
 
     }
 
+    void prepareResponse(ServerResponse response) {
+
+        response.contentType = "text/plain";
+        response.headers["Access-Control-Allow-Origin"] = "*";
+
+    }
+
     @Get("sliddes/next-slide")
     void nextSlide(ServerResponse response) {
 
-        response.contentType = "text/plain";
+        prepareResponse(response);
         response.body = "OK";
 
         target.send(OffsetSlideMsg(1));
@@ -31,7 +38,7 @@ class Controller {
     @Get("sliddes/previous-slide")
     void previousSlide(ServerResponse response) {
 
-        response.contentType = "text/plain";
+        prepareResponse(response);
         response.body = "OK";
 
         target.send(OffsetSlideMsg(-1));
@@ -41,22 +48,20 @@ class Controller {
     @Get("sliddes/slide", r"(\d+)")
     void setSlide(ServerResponse response, string slide) {
 
-        response.contentType = "text/plain";
+        prepareResponse(response);
 
-        try {
+        response.body = "OK " ~ slide;
+        target.send(SetSlideMsg(slide.to!size_t));
 
-            const slideID = slide.to!size_t;
-            response.body = "OK " ~ slide;
-            target.send(SetSlideMsg(slideID));
+    }
 
-        }
+    @Get("sliddes/test", r"(\d+)")
+    void test(ServerResponse response, string id) {
 
-        // This shouldn't ever happen for this regex, unless there's a deliberate attack
-        catch (ConvException) {
+        prepareResponse(response);
 
-            assert(false, "Couldn't convert to size_t");
-
-        }
+        response.body = "OK " ~ id;
+        target.send(TestMsg(id.to!int));
 
     }
 
