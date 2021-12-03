@@ -6,6 +6,9 @@ import std.string;
 import std.algorithm;
 import std.exception;
 
+import sliddes.controller;
+import sliddes.transmitter;
+
 
 @safe:
 
@@ -85,7 +88,20 @@ struct Presentation {
         // Create the output directory
         output.mkdirRecurse();
 
+        void copyResource(string name) {
+
+            copy(
+                buildPath(thisExePath.dirName, "resources", name),
+                buildPath(output, name),
+            );
+
+        }
+
         // Load stylesheet
+        copyResource("basic.css");
+        copyResource("receiver.js");
+
+        // Load scripts
         copy(
             buildPath(thisExePath.dirName, "resources/basic.css"),
             buildPath(output, "basic.css"),
@@ -104,7 +120,32 @@ struct Presentation {
     }
 
     /// Start the presentation server.
-    noreturn present() const {
+    noreturn present() const @trusted {
+
+        import lighttp;
+        import std.concurrency;
+
+        // Spawn transmitter thread
+        auto tid = spawn({
+
+            with (new Server) {
+
+                host("127.0.0.1", 8091);
+                router.add(new Transmitter);
+                run();
+
+            }
+
+        });
+
+        // Run controller
+        with (new Server) {
+
+            host("127.0.0.1", 8090);
+            router.add(new Controller(tid));
+            run();
+
+        }
 
     }
 
@@ -141,6 +182,9 @@ struct Presentation {
                 stylesheets,
 
                 elem!"title"(title),
+                elem!"script"(
+                    attr("src") = "receiver.js"
+                ),
             ),
             elem!"body"(
                 elem!"noscript"(
