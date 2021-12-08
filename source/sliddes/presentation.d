@@ -6,6 +6,7 @@ import std.string;
 import std.algorithm;
 import std.exception;
 
+import sliddes.slide;
 import sliddes.controller;
 import sliddes.transmitter;
 
@@ -37,22 +38,34 @@ struct Presentation {
 
     }
 
-    ref Presentation add(alias fun, T...)(T args) {
+    /// Add a slide.
+    ref Presentation add(Slide slide) return {
+
+        prepareBoilerplate();
+        slides ~= slide.output(this);
+        slideTitles ~= format!"%s"(slide);
+
+        return this;
+
+    }
+
+    /// Create and add a slide.
+    ref Presentation add(string title, void delegate(ref Slide slide) @safe creator) return {
+
+        auto slide = Slide(title).adjust(creator);
+
+        return this.add(slide);
+
+    }
+
+    /// Add a slide created with the slide generator.
+    ref Presentation add(alias fun, T...)(T args) return {
 
         import std.traits;
 
         alias Params = Parameters!fun;
 
-        // Prepare the template
-        if (!boilerplate) {
-
-            boilerplate = delegate(string[] cls...)
-                => elem!"div"(
-                    attr("class") = ["slide"] ~ cls,
-                );
-
-        }
-
+        prepareBoilerplate();
         slides ~= fun(this, args);
 
         // Get the args for the admin panel
@@ -281,6 +294,19 @@ struct Presentation {
 
     }
 
+    private void prepareBoilerplate() {
+
+        // Template already exists
+        if (boilerplate) return;
+
+        // Prepare the template
+        boilerplate = delegate(string[] cls...)
+            => elem!"div"(
+                attr("class") = ["slide"] ~ cls,
+            );
+
+    }
+
 }
 
 unittest {
@@ -289,6 +315,13 @@ unittest {
 
     Presentation("Welcome to my presentation")
         .add!titleSlide("This is a subtitle")
+        .add("Sample slide", (ref slide) {
+
+            slide.topLeft = elem!"h1"("Top left!");
+            slide.topRight = elem!"h2"("Top right!");
+            slide.bottomRight = elem!"h3"("Bottom right!");
+
+        })
         .generate("public/test1");
 
 }

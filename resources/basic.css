@@ -5,6 +5,8 @@ html, body {
     margin: 0;
     padding: 0;
 
+    --slide-padding: 10px;
+
 }
 
 img {
@@ -15,16 +17,13 @@ img {
 
 div.slide {
 
+    position: relative;
     height: 100vh;
     margin: 0;
-    padding: 10px;
+    padding: var(--slide-padding);
     box-sizing: border-box;
 
-}
-
-div.image-slide img {
-
-    max-height: 80vh;
+    background-size: cover;
 
 }
 
@@ -49,5 +48,43 @@ div.popup {
     background: #fff;
     box-shadow: #000a 0 0 10px;
     border-radius: 5px;
+
+}
+
+div.top {
+
+    position: absolute;
+    left: var(--slide-padding);
+    right: var(--slide-padding);
+    top: var(--slide-padding);
+
+}
+
+div.bottom {
+
+    position: absolute;
+    left: var(--slide-padding);
+    right: var(--slide-padding);
+    bottom: var(--slide-padding);
+
+}
+
+div.left {
+
+    float: left;
+    text-align: left;
+
+}
+
+div.right {
+
+    float: right;
+    text-align: right;
+
+}
+
+div.image-slide img {
+
+    max-height: 80vh;
 
 }
